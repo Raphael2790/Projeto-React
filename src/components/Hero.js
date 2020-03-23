@@ -5,3 +5,7 @@ export default function Hero({children, hero}) {
   <header className={hero}>{children}</header>
   )
 }
+
+Hero.defaultProps = {
+  hero: "defaultHero"
+}
