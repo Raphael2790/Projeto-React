@@ -8,7 +8,16 @@ class RoomProvider extends Component {
     rooms:[],
     sortedRooms:[],
     featuredRooms:[],
-    loading:true
+    loading:true,
+    pets:false,
+    type:'all',
+    capacity:1,
+    price:0,
+    minPrice:0,
+    maxPrice:0,
+    breakfast:false,
+    maxSize:0,
+    minSize:0
   }
 
   //getData
@@ -18,11 +27,17 @@ componentDidMount() {
   let featuredRooms = rooms.filter(room => 
     room.featured === true
   );
+  let maxPrice = Math.max(...rooms.map(item => item.price));
+  let maxSize = Math.max(...rooms.map(item => item.size));
+  
   this.setState ({
     rooms,
     featuredRooms,
     loading:false,
-    sortedRooms:rooms
+    sortedRooms:rooms,
+    price: maxPrice, 
+    maxPrice,
+    maxSize,
   })
 }
 
@@ -44,11 +59,36 @@ getRoom = slug => {
   return room;
 }
 
+handleChange = event => {
+  const target = event.target 
+  const value = event.type === "checkbox"?target.checked:target.value;
+  const name = event.target.name;
+  this.setState(
+    {
+      [name]:value
+    },
+    this.filterRooms
+  );
+}
+
+filterRooms = () => {
+  let {
+    rooms,type,capacity,price,minPrice,maxPrice,minSize,maxSize,
+    breakfast,pets} = this.state;
+    let tempRooms = [...rooms];
+    if(type !== 'all') {
+      tempRooms = tempRooms.filter(room => room.type === type)
+    }
+    this.setState({
+      sortedRooms:tempRooms
+    })
+  }
+
 
   render() {
     return (
      <RoomContext.Provider value={{...this.state,
-     getRoom:this.getRoom}}>
+     getRoom:this.getRoom, handleChange:this.handleChange}}>
        {this.props.children}
      </RoomContext.Provider>
     )
